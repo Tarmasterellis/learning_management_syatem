@@ -1,0 +1,42 @@
+import { db } from "@/lib/db";
+import { auth } from "@clerk/nextjs";
+import { NextResponse } from "next/server";
+
+export async function PUT(req : Request, { params } : { params: { courseId: string } }) {
+    try
+    {
+        const { userId } = auth();
+
+        if(!userId) {
+            return new NextResponse("Unauthorized User, Please Register yourself and try again later...!", { status : 401 });
+        }
+
+        const { list } = await req.json();
+
+        const courseOwner = await db.course.findUnique({
+            where: {
+                id: params.courseId,
+                userId: userId,
+            },
+        });
+
+        if(!courseOwner) {
+            return new NextResponse("You are not the Owner of this course...!", { status : 401 });
+        }
+
+        for(let item of list)
+        {
+            await db.chapter.update({
+                where: { id: item.id },
+                data: { position: item.position },
+            });
+        }
+
+        return new NextResponse("Successfully Updated the Order of the Course...!", { status : 200 });
+    }
+    catch(error)
+    {
+        console.log("[Courses -> Chapter Updating Error] : <====>", error);
+        return new NextResponse("Internal Error", { status : 500 });
+    }
+}
