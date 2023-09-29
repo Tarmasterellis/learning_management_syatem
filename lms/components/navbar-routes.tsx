@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { LogOut } from "lucide-react";
 import { UserButton } from "@clerk/nextjs";
-import { Button } from "@/components/ui/button";
+import { SearchInput } from "./search-input";
 import { usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 export const NavbarRoutes = () => {
 
@@ -12,11 +13,17 @@ export const NavbarRoutes = () => {
 
     const isTeacherPage = pathName?.startsWith("/teacher");
     const isPlayerPage = pathName?.includes("/chapter");
-
-
+    const isSearchPage = pathName === "/search";
 
     return (
         <>
+            {
+                isSearchPage && (
+                    <div className="hidden md:block">
+                        <SearchInput />
+                    </div>
+                )
+            }
             <div className="flex gap-x-2 ml-auto">
                 {
                     isTeacherPage || isPlayerPage ? (
