@@ -1,8 +1,27 @@
-const AnalyticsPage = () => {
+import { auth } from "@clerk/nextjs";
+import { redirect } from "next/navigation";
+import { Chart } from "./_components/chart";
+import { DataCard } from "./_components/data-card";
+import { getAnalytics } from "@/actions/get-analytics";
+import { IndianRupeeIcon, ShieldCheck } from "lucide-react";
+
+const AnalyticsPage = async () => {
+
+    const { userId } = auth();
+
+    if(!userId) return redirect("/");
+
+    const { data, totalRevenue, totalSales } = await getAnalytics(userId)
+
+
     return (
         <>
-            <div>
-                Analyrics Page...!
+            <div className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <DataCard icon={ IndianRupeeIcon } value={ totalRevenue } label={ "Total Revenue" } shouldFormat= { true } />
+                    <DataCard icon={ ShieldCheck } value={ totalSales } label={ "Total Sales" } shouldFormat= { false } />
+                </div>
+                <Chart data={ data } />
             </div>
         </>
     );
